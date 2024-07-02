@@ -1,0 +1,64 @@
+- hosts: nodes
+  become: yes
+  gather_facts: no
+  vars:
+    iscsi_device: /dev/sda
+    iscsi_server_ip: "10.5.0.100"
+    iscsi_target_iqn: "iqn.2024-06.com.example:storage.target1"
+    node1_iqn: "iqn.2024-06.com.example:node1.11111111"
+    node2_iqn: "iqn.2024-06.com.example:node2.22222222"
+    node3_iqn: "iqn.2024-06.com.example:node3.33333333"
+  tasks:
+    - name: Update yum cache
+      yum:
+        name: "*"
+        state: latest
+      tags:
+        - always
+
+    - name: Install required packages
+      yum:
+        name:
+          - iscsi-initiator-utils
+          - lvm2
+          - lvm2-cluster
+          - gfs2-utils
+          - pacemaker
+          - pcs
+          - fence-agents-all
+          - resource-agents
+          - epel-release
+          - python3
+          - python3-pip
+          - dlm
+        state: present
+
+    - name: Set ansible_python_interpreter to /bin/python3
+      set_fact:
+        ansible_python_interpreter: /bin/python3
+        
+
+    - name: Set iSCSI InitiatorName for node1
+      when: inventory_hostname in groups['node1']
+      lineinfile:
+        path: /etc/iscsi/initiatorname.iscsi
+        regexp: "^InitiatorName=.*"
+        line: "InitiatorName={{ node1_iqn }}"
+        
+    - name: Set iSCSI InitiatorName for node2
+      when: inventory_hostname in groups['node2']
+      lineinfile:
+        path: /etc/iscsi/initiatorname.iscsi
+        regexp: "^InitiatorName=.*"
+        line: "InitiatorName={{ node2_iqn }}"
+        
+    - name: Set iSCSI InitiatorName for node3
+      when: inventory_hostname in groups['node3']
+      lineinfile:
+        path: /etc/iscsi/initiatorname.iscsi
+        regexp: "^InitiatorName=.*"
+        line: "InitiatorName={{ node3_iqn }}"
+
+    - name: Include gfs2_client role
+      include_role:
+        name: gfs2_client

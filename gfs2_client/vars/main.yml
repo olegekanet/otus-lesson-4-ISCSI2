@@ -1,0 +1,9 @@
+---
+# vars file for gfs2_client
+hacluster_pass: 23ewdscx@wsx
+iscsi_device: /dev/sda
+iscsi_server_ip: "10.5.0.100"
+iscsi_target_iqn: "iqn.2024-06.com.example:storage.target1"
+node1_iqn: "iqn.2024-06.com.example:node1.11111111"
+node2_iqn: "iqn.2024-06.com.example:node2.22222222"
+node3_iqn: "iqn.2024-06.com.example:node3.33333333"
